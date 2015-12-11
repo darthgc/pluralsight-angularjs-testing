@@ -1,4 +1,6 @@
 describe('omdb service', function() {
+    var omdbApi = { };
+
     var movieData = {
         "Search":[
             {"Title":"Star Wars: Episode IV - A New Hope","Year":"1977","imdbID":"tt0076759","Type":"movie","Poster":"http://ia.media-imdb.com/images/M/MV5BMTU4NTczODkwM15BMl5BanBnXkFtZTcwMzEyMTIyMw@@._V1_SX300.jpg"},
@@ -14,13 +16,46 @@ describe('omdb service', function() {
         ]
     };
 
-    it('should return search movie data', function() {
-        var service = {
-            search: function(query) {
-                return movieData;
-            }
-        };
+    var movieDataById = {"Title":"Star Wars: Episode IV - A New Hope","Year":"1977","Rated":"PG","Released":"25 May 1977","Runtime":"121 min","Genre":"Action, Adventure, Fantasy","Director":"George Lucas","Writer":"George Lucas","Actors":"Mark Hamill, Harrison Ford, Carrie Fisher, Peter Cushing","Plot":"Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a wookiee and two droids to save the universe from the Empire's world-destroying battle-station, while also attempting to rescue Princess Leia from the evil Darth Vader.","Language":"English","Country":"USA","Awards":"Won 6 Oscars. Another 38 wins & 27 nominations.","Poster":"http://ia.media-imdb.com/images/M/MV5BMTU4NTczODkwM15BMl5BanBnXkFtZTcwMzEyMTIyMw@@._V1_SX300.jpg","Metascore":"92","imdbRating":"8.7","imdbVotes":"802,804","imdbID":"tt0076759","Type":"movie","Response":"True"};
 
-        expect(service.search('star wars')).toEqual(movieData);
+    beforeEach(function() {
+        // String literal technique
+        angular.mock.module('omdb');
+
+        angular.mock.inject(function(_omdbApi_) {
+            omdbApi = _omdbApi_;
+        });
+    });
+
+    it('should return search movie data', function() {
+        // Object literal technique (cannot pass other services to it)
+        // angular.mock.module({
+        //     'omdbApi': {
+        //         search: function(query) {
+        //             return movieData;
+        //         }
+        //     }
+        // });
+
+        // Anonymous function technique
+        // angular.mock.module(function($provide) {
+        //     $provide.factory('omdbApi', function() {
+        //         return {
+        //             search: function() {
+        //                 return movieData;
+        //             }
+        //         };
+        //     });
+        // });
+
+        // Easy to read format
+        // console.log(angular.mock.dump(movieData));
+        // Still easy to read format, but with the Karma dump, which is used to print in the debugger
+        // dump(angular.mock.dump(movieData));
+        expect(omdbApi.search('star wars')).toEqual(movieData);
+    });
+
+    it('should return movie data by id', function() {
+        expect(omdbApi.find('tt0076759')).toEqual(movieDataById);
     });
 });
