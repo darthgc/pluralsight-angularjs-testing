@@ -1,4 +1,5 @@
 describe('omdb service', function() {
+    var $httpBackend;
     var omdbApi = { };
 
     var movieData = {
@@ -22,9 +23,30 @@ describe('omdb service', function() {
         // String literal technique
         angular.mock.module('omdb');
 
-        angular.mock.inject(function(_omdbApi_) {
+        angular.mock.inject(function(_omdbApi_, _$httpBackend_) {
             omdbApi = _omdbApi_;
+            $httpBackend = _$httpBackend_;
         });
+    });
+
+    it('should handle errors', function() {
+        var expectedUrl = 'http://www.omdbapi.com/?v=1&i=tt0076759';
+        var response;
+
+        $httpBackend.expect('GET', expectedUrl)
+            .respond(500);
+
+        omdbApi.find('tt0076759')
+            .then(function(data) {
+                response = data
+            })
+            .catch(function() {
+                response = 'Error!';
+            });
+
+        $httpBackend.flush();
+
+        expect(response).toEqual('Error!');
     });
 
     it('should return search movie data', function() {
@@ -52,10 +74,41 @@ describe('omdb service', function() {
         // console.log(angular.mock.dump(movieData));
         // Still easy to read format, but with the Karma dump, which is used to print in the debugger
         // dump(angular.mock.dump(movieData));
-        expect(omdbApi.search('star wars')).toEqual(movieData);
+
+        var response;
+        // Can use directly the url, or a function, so that we can check other things
+        // var expectedUrl = 'http://www.omdbapi.com/?v=1&s=star%20wars';
+
+        // Such as the validity of the url. Can use regex as well for more complex stuff
+        var expectedUrl = function(url) {
+            return url.indexOf('http://www.omdbapi.com') !== -1;
+        };
+        $httpBackend.when('GET', expectedUrl)
+            .respond(200, movieData);
+
+        omdbApi.search('star wars').then(function(data) {
+            response = data
+        });
+
+        // Resolves all the http request that have been called
+        $httpBackend.flush();
+
+        expect(response).toEqual(movieData);
     });
 
     it('should return movie data by id', function() {
-        expect(omdbApi.find('tt0076759')).toEqual(movieDataById);
+        var expectedUrl = 'http://www.omdbapi.com/?v=1&i=tt0076759';
+        var response;
+
+        $httpBackend.expect('GET', expectedUrl)
+            .respond(200, movieDataById);
+
+        omdbApi.find('tt0076759').then(function(data) {
+            response = data
+        });
+
+        $httpBackend.flush();
+
+        expect(response).toEqual(movieDataById);
     });
 });
