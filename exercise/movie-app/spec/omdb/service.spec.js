@@ -3,12 +3,18 @@ describe('omdb service', function() {
 	var movieDataById = {"Title":"Star Wars: Episode IV - A New Hope","Year":"1977","Rated":"PG","Released":"25 May 1977","Runtime":"121 min","Genre":"Action, Adventure, Fantasy","Director":"George Lucas","Writer":"George Lucas","Actors":"Mark Hamill, Harrison Ford, Carrie Fisher, Peter Cushing","Plot":"Luke Skywalker joins forces with a Jedi Knight, a cocky pilot, a wookiee and two droids to save the universe from the Empire's world-destroying battle-station, while also attempting to rescue Princess Leia from the evil Darth Vader.","Language":"English","Country":"USA","Awards":"Won 6 Oscars. Another 38 wins & 27 nominations.","Poster":"http://ia.media-imdb.com/images/M/MV5BMTU4NTczODkwM15BMl5BanBnXkFtZTcwMzEyMTIyMw@@._V1_SX300.jpg","Metascore":"92","imdbRating":"8.7","imdbVotes":"764377","imdbID":"tt0076759","Type":"movie","Response":"True"};
 	var omdbApi = {};
 	var $httpBackend;
+	var $exceptionHandler;
 
 	beforeEach(module('omdb'));
 
-	beforeEach(inject(function(_omdbApi_, _$httpBackend_) {
+	beforeEach(module(function($exceptionHandlerProvider) {
+	    $exceptionHandlerProvider.mode('log');
+	}));
+
+	beforeEach(inject(function(_omdbApi_, _$httpBackend_, _$exceptionHandler_) {
 		omdbApi = _omdbApi_;
 		$httpBackend = _$httpBackend_;
+		$exceptionHandler = _$exceptionHandler_;
 	}));
 
 	it('should return search movie data', function() {
@@ -67,4 +73,22 @@ describe('omdb service', function() {
 
 		expect(response).toEqual(movieDataById);
 	});
+
+	it('should handle server error', function() {
+		var response;
+
+		$httpBackend.expect('GET', 'http://www.omdbapi.com/?v=1&i=tt0076759')
+			.respond(500, 'Server is broken');
+
+		omdbApi.find('tt0076759')
+			.catch(function(e) {
+				$exceptionHandler(e);
+			});
+
+		$httpBackend.flush();
+
+		expect($exceptionHandler.errors).toEqual(['Server is broken']);
+	});
+
+
 });

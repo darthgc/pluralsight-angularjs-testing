@@ -9,8 +9,8 @@ angular.module('omdb', [])
 				.success(function(data) {
 					deferred.resolve(data);
 				})
-				.error(function() {
-					deferred.reject();
+				.error(function(e) {
+					deferred.reject(e);
 				});
 			return deferred.promise;
 		}
