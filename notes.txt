@@ -1,0 +1,15 @@
+Module 3
+--------
+
+.when vs .expect
+
+.when: 
+	black-box testing
+	working with data
+	re-use allowed
+
+.expect
+	strict usage testing
+	best for exact usage
+	re-use not allowed
+
