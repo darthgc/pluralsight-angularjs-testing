@@ -1,8 +1,10 @@
 angular.module('movieApp')
-	.controller('ResultsController', function($scope, $location, $exceptionHandler, omdbApi) {
+	.controller('ResultsController', function($scope, $location, $exceptionHandler, $log, omdbApi) {
 		var query = $location.search().q;
+		$log.debug('Controller loaded with query: ', query);
 		omdbApi.search(query)
 			.then(function(data) {
+				$log.debug('Data returned for query: ', query, data);
 				$scope.results = data.Search;
 			})
 			.catch(function(e) {
@@ -12,6 +14,7 @@ angular.module('movieApp')
 		$scope.expand = function expand(index, id) {
 			omdbApi.find(id)
 				.then(function(data) {
+					$log.debug('Getting expanded movie data: ', index, id, data);
 					$scope.results[index].data = data;
 					$scope.results[index].open = true;
 				});
