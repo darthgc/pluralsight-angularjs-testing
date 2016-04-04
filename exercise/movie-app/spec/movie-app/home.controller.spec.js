@@ -63,10 +63,8 @@ describe('Home Controller', function() {
 
 	it('should rotate movies every 5 seconds', function() {
 		
-		spyOn(PopularMovies, 'get').and.callFake(function() {
-			var deferred = $q.defer();
-			deferred.resolve(['tt0076759', 'tt0080684', 'tt0086190']);
-			return deferred.promise;
+		spyOn(PopularMovies, 'query').and.callFake(function(cb) {
+			cb(['tt0076759', 'tt0080684', 'tt0086190']);
 		});
 
 		$controller('HomeController', { 
@@ -76,7 +74,7 @@ describe('Home Controller', function() {
 			PopularMovies: PopularMovies
 		});
 		$rootScope.$apply();
-
+		
 		// should have a default movie
 		expect($scope.result.Title).toBe(results[0].Title);
 		// should update after 5 seconds
@@ -92,10 +90,8 @@ describe('Home Controller', function() {
 
 	it('should handle error', function() {
 		
-		spyOn(PopularMovies, 'get').and.callFake(function() {
-			var deferred = $q.defer();
-			deferred.resolve(['tt0076759', 'tt0080684', 'tt0086190', 'ttError']);
-			return deferred.promise;
+		spyOn(PopularMovies, 'query').and.callFake(function(cb) {
+			cb(['tt0076759', 'tt0080684', 'tt0086190', 'ttError']);
 		});
 
 		$controller('HomeController', { 
@@ -121,16 +117,3 @@ describe('Home Controller', function() {
 	});
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
