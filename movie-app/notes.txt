@@ -1,0 +1,1 @@
+- To follow the convention, be able to run test with: npm test
