@@ -11,8 +11,8 @@ describe('MovieCore', function() {
 	}));
 
 	afterEach(function() {
-		$httpBackend.verifyNoOutstandingExpectation(); // Verify that only configured calls are made
-		$httpBackend.verifyNoOutstandingRequest(); // No request that we setup and we forgot to flush (safety net for error in the test code)
+		$httpBackend.verifyNoOutstandingExpectation();
+		$httpBackend.verifyNoOutstandingRequest();
 	})
 
 	it('should create popular movie', function() {
